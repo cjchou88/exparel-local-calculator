@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>How Much Local After Exparel Block</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: inputs on the left as numbered workflow panels; result panel sticks on the right like a syringe label. Grey = ISO local-anesthetic label color. */
+:root{
+  --bg:#eef0f1; --panel:#ffffff; --ink:#16202a; --muted:#5b6670; --line:#d5dadd;
+  --la-grey:#8a9399; --la-grey-soft:#e3e6e8; --accent:#0b5d7a; --accent-ink:#ffffff;
+  --exparel:#6b4fa0; --block:#0b5d7a; --prior:#b07a1e; --avail:#2f8a57; --over:#c0392b;
+  --warn-bg:#fff6e0; --warn-ink:#6b4b00; --danger-bg:#fde8e6; --danger-ink:#8a1f14;
+  --f-display:"Barlow Condensed","Arial Narrow",sans-serif;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1418; --panel:#172027; --ink:#e6ebee; --muted:#9aa6ae; --line:#2b3740;
+  --la-grey:#7d878d; --la-grey-soft:#243039; --accent:#4fb3d6; --accent-ink:#06222c;
+  --exparel:#a58bd6; --block:#4fb3d6; --prior:#e0a94a; --avail:#5cc28a; --over:#ff7a6b;
+  --warn-bg:#3a2f12; --warn-ink:#f5d58a; --danger-bg:#3d1a16; --danger-ink:#ffb3a8; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1418; --panel:#172027; --ink:#e6ebee; --muted:#9aa6ae; --line:#2b3740;
+  --la-grey:#7d878d; --la-grey-soft:#243039; --accent:#4fb3d6; --accent-ink:#06222c;
+  --exparel:#a58bd6; --block:#4fb3d6; --prior:#e0a94a; --avail:#5cc28a; --over:#ff7a6b;
+  --warn-bg:#3a2f12; --warn-ink:#f5d58a; --danger-bg:#3d1a16; --danger-ink:#ffb3a8; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header{display:flex;flex-direction:column;gap:6px}
+h1{font-family:var(--f-display);font-weight:700;font-size:2.2rem;line-height:1.05;margin:0;letter-spacing:.01em;text-wrap:balance}
+.lede{color:var(--muted);margin:0;max-width:68ch}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}.result{order:-1;position:static!important}}
+.inputs{display:flex;flex-direction:column;gap:16px;min-width:0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel h2{font-family:var(--f-display);font-weight:600;font-size:1.25rem;margin:0;display:flex;align-items:center;gap:10px;letter-spacing:.02em}
+.step{font-family:var(--f-mono);font-size:.75rem;background:var(--la-grey-soft);color:var(--muted);border-radius:4px;padding:2px 7px}
+.hint{color:var(--muted);font-size:.85rem;margin:0}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);min-width:0}
+input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%;min-width:0;text-transform:none;letter-spacing:0;font-weight:400}
+input[type=number]{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+input:focus-visible,select:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chk{display:flex;align-items:center;gap:8px;font-size:.92rem;text-transform:none;letter-spacing:0;color:var(--ink);font-weight:400}
+.chk input{width:auto}
+.sub{border-top:1px dashed var(--line);padding-top:12px;display:flex;flex-direction:column;gap:10px}
+.sub h3{margin:0;font-size:.82rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.mixrow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,.8fr);gap:10px;align-items:end}
+@media (max-width:480px){.mixrow{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.mixrow .drug{grid-column:1/-1}}
+.calc{font-family:var(--f-mono);font-size:.82rem;color:var(--muted)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+/* Result: styled like a local-anesthetic syringe label (grey band) */
+.result{position:sticky;top:max(16px,env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:14px}
+.label{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.band{background:var(--la-grey);color:#fff;padding:8px 16px;font-family:var(--f-display);font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:.85rem;display:flex;justify-content:space-between}
+.label-body{padding:16px;display:flex;flex-direction:column;gap:12px}
+.big{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.big .n{font-family:var(--f-display);font-weight:700;font-size:4rem;line-height:.9;font-variant-numeric:tabular-nums}
+.big .u{font-family:var(--f-display);font-size:1.6rem;font-weight:600;color:var(--muted)}
+.big.zero .n{color:var(--over)}
+.mixname{font-weight:700;font-size:1.05rem}
+table.mg{width:100%;border-collapse:collapse;font-size:.88rem}
+table.mg td{padding:5px 0;border-bottom:1px solid var(--line)}
+table.mg td:last-child{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.bar{display:flex;height:18px;border-radius:5px;overflow:hidden;background:var(--la-grey-soft);position:relative}
+.bar span{display:block;height:100%}
+.legend{display:grid;grid-template-columns:1fr auto;gap:3px 10px;font-size:.82rem}
+.legend .k{display:flex;align-items:center;gap:7px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.legend b{font-family:var(--f-mono);font-weight:400;font-variant-numeric:tabular-nums}
+.alert{border-radius:8px;padding:10px 12px;font-size:.86rem;line-height:1.45}
+.alert.warn{background:var(--warn-bg);color:var(--warn-ink)}
+.alert.danger{background:var(--danger-bg);color:var(--danger-ink)}
+.alert strong{display:block;margin-bottom:2px}
+details summary{cursor:pointer;font-weight:700}
+.limits{overflow-x:auto}
+.limits table{border-collapse:collapse;width:100%;min-width:520px;font-size:.85rem}
+.limits th,.limits td{padding:6px;border-bottom:1px solid var(--line);text-align:left}
+.limits th{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.limits input{padding:5px 7px;font-size:.9rem}
+footer{color:var(--muted);font-size:.8rem;max-width:80ch}
+@media (prefers-reduced-motion:no-preference){.bar span{transition:width .25s ease}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+<header>
+  <h1>How Much Local After Exparel Block</h1>
+  <p class="lede">After a block with Exparel, work out how many mL of additional local anesthetic or admixture can still be given within combined toxic-dose limits. Uses the additive method: each drug's dose as a fraction of its own maximum, summed, must stay at or below 100%.</p>
+</header>
+
+<div class="grid">
+<div class="inputs">
+
+  <section class="panel">
+    <h2><span class="step">1</span>Patient</h2>
+    <div class="row">
+      <label class="f" for="wt">Dosing weight (kg)<input id="wt" type="number" min="1" step="0.1" value="80"></label>
+      <label class="f" for="reduce">Reduce all limits by (%)<input id="reduce" type="number" min="0" max="90" step="5" value="0"></label>
+    </div>
+    <p class="hint">Use lean or ideal body weight in obesity. Consider a reduction for elderly, frail, hepatic or cardiac impairment, pregnancy, or low albumin.</p>
+  </section>
+
+  <section class="panel">
+    <h2><span class="step">2</span>Block already given</h2>
+    <div class="row">
+      <label class="f" for="exMg">Exparel (mg)
+        <select id="exMg"><option value="0">None</option><option value="133" selected>133 mg (10 mL)</option><option value="266">266 mg (20 mL)</option><option value="custom">Other…</option></select>
+      </label>
+      <label class="f" for="exCustom" id="exCustomWrap" hidden>Exparel mg<input id="exCustom" type="number" min="0" max="266" step="1" value="100"></label>
+    </div>
+    <div class="sub">
+      <h3>How to count Exparel</h3>
+      <div class="seg" id="exMethodSeg">
+        <button type="button" data-v="max" aria-pressed="true">Against Exparel max (266 mg)</button>
+        <button type="button" data-v="abs" aria-pressed="false">As bupivacaine mg (weight-based)</button>
+      </div>
+      <p class="hint" id="exMaxHint">The Exparel dose counts as a share of its own 266 mg maximum. For example, 133 mg uses 50% of the budget.</p>
+      <div id="exAbsWrap" hidden style="display:flex;flex-direction:column;gap:10px">
+        <div class="row">
+          <label class="f" for="exBasis">Count Exparel as
+            <select id="exBasis"><option value="raw">Raw mg (133 mg = 133 mg)</option><option value="hcl">Bupivacaine HCl equivalent (133 mg = 150 mg)</option></select>
+          </label>
+          <label class="f" for="exRelease">Released to bloodstream (%)<input id="exRelease" type="number" min="0" max="100" step="5" value="100"></label>
+        </div>
+        <p class="hint">Enter the share of the Exparel dose you consider immediately available systemically. 100% is the most conservative choice. That share counts against the weight-based plain bupivacaine limit.</p>
+      </div>
+    </div>
+    <div class="sub">
+      <h3>Plain local admixed into the block</h3>
+      <div class="mixrow">
+        <label class="f drug" for="bDrug">Drug<select id="bDrug"></select></label>
+        <label class="f" for="bConc">Conc (%)<input id="bConc" type="number" min="0" step="0.025" value="0.5"></label>
+        <label class="f" for="bVol">Volume (mL)<input id="bVol" type="number" min="0" step="1" value="10"></label>
+      </div>
+      <label class="chk" for="bEpi"><input id="bEpi" type="checkbox"> Contains epinephrine</label>
+      <div class="calc" id="bCalc"></div>
+    </div>
+    <div class="sub">
+      <h3>Any other local already given (optional)</h3>
+      <div class="mixrow">
+        <label class="f drug" for="pDrug">Drug<select id="pDrug"></select></label>
+        <label class="f" for="pConc">Conc (%)<input id="pConc" type="number" min="0" step="0.025" value="1"></label>
+        <label class="f" for="pVol">Volume (mL)<input id="pVol" type="number" min="0" step="1" value="0"></label>
+      </div>
+      <label class="chk" for="pEpi"><input id="pEpi" type="checkbox"> Contains epinephrine</label>
+      <div class="calc" id="pCalc"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2><span class="step">3</span>Additional local or admixture</h2>
+    <p class="hint">Enter the recipe by parts (for example 1 : 1). Saline parts dilute the mix.</p>
+    <div class="mixrow">
+      <label class="f drug" for="m1Drug">Drug A<select id="m1Drug"></select></label>
+      <label class="f" for="m1Conc">Conc (%)<input id="m1Conc" type="number" min="0" step="0.025" value="0.25"></label>
+      <label class="f" for="m1Parts">Parts<input id="m1Parts" type="number" min="0" step="1" value="1"></label>
+    </div>
+    <div class="mixrow">
+      <label class="f drug" for="m2Drug">Drug B<select id="m2Drug"></select></label>
+      <label class="f" for="m2Conc">Conc (%)<input id="m2Conc" type="number" min="0" step="0.025" value="1"></label>
+      <label class="f" for="m2Parts">Parts<input id="m2Parts" type="number" min="0" step="1" value="1"></label>
+    </div>
+    <div class="row">
+      <label class="f" for="nsParts">Saline parts<input id="nsParts" type="number" min="0" step="1" value="0"></label>
+    </div>
+    <label class="chk" for="mEpi"><input id="mEpi" type="checkbox" checked> Mixture contains epinephrine</label>
+    <div class="calc" id="mCalc"></div>
+  </section>
+
+  <section class="panel">
+    <details>
+      <summary>Maximum dose limits (editable)</summary>
+      <p class="hint" style="margin-top:8px">Commonly cited adult values. Each limit is the lower of mg/kg × weight and the absolute cap. Change these to match your department's protocol.</p>
+      <div class="limits"><table id="limTbl">
+        <thead><tr><th>Drug</th><th>Plain mg/kg</th><th>Plain max mg</th><th>With epi mg/kg</th><th>With epi max mg</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+      <p class="hint">Exparel maximum: 266 mg (one 20 mL vial, equivalent to 300 mg bupivacaine HCl). Label admixing rule: bupivacaine HCl mg ≤ ½ the Exparel mg.</p>
+    </details>
+  </section>
+</div>
+
+<aside class="result" aria-live="polite">
+  <div class="label">
+    <div class="band"><span>Local anesthetic</span><span>Max remaining</span></div>
+    <div class="label-body">
+      <div class="big" id="big"><span class="n" id="maxMl">–</span><span class="u">mL</span></div>
+      <div class="mixname" id="mixName"></div>
+      <table class="mg" id="mgTbl"></table>
+      <div>
+        <div class="bar" id="bar" role="img" aria-label="Share of combined toxic-dose budget"></div>
+      </div>
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+  <div id="alerts" style="display:flex;flex-direction:column;gap:10px"></div>
+</aside>
+</div>
+
+<footer>Decision support only. Verify every number and apply clinical judgment; limits vary by source, site vascularity, and patient. Keep 20% lipid emulsion available and monitor for LAST (perioral numbness, tinnitus, agitation, seizures, arrhythmia) for the duration of absorption.</footer>
+</div>
+
+<script>
+const DRUGS={
+  bupi:{name:"Bupivacaine",plain:[2.5,175],epi:[3,225]},
+  lido:{name:"Lidocaine",plain:[4.5,300],epi:[7,500]},
+  ropi:{name:"Ropivacaine",plain:[3,225],epi:[3,225]},
+  chloro:{name:"Chloroprocaine",plain:[11,800],epi:[14,1000]},
+};
+const $=id=>document.getElementById(id);
+let exMethod="max";
+
+function fillSelect(sel,def,allowNone){
+  const el=$(sel); el.innerHTML="";
+  if(allowNone){el.add(new Option("None",""));}
+  for(const k in DRUGS) el.add(new Option(DRUGS[k].name,k));
+  el.value=def;
+}
+fillSelect("bDrug","bupi");fillSelect("pDrug","lido");fillSelect("m1Drug","bupi");fillSelect("m2Drug","lido",true);
+
+function buildLimits(){
+  const tb=document.querySelector("#limTbl tbody");tb.innerHTML="";
+  for(const k in DRUGS){
+    const d=DRUGS[k],tr=document.createElement("tr");
+    tr.innerHTML=`<td>${d.name}</td>`+[["plain",0],["plain",1],["epi",0],["epi",1]].map(([t,i])=>
+      `<td><input type="number" id="lim-${k}-${t}-${i}" min="0" step="${i?5:0.5}" value="${d[t][i]}" aria-label="${d.name} ${t} ${i?'max mg':'mg/kg'}"></td>`).join("");
+    tb.appendChild(tr);
+  }
+  tb.querySelectorAll("input").forEach(inp=>inp.addEventListener("input",()=>{
+    const [,k,t,i]=inp.id.split("-");DRUGS[k][t][+i]=parseFloat(inp.value)||0;calc();
+  }));
+}
+buildLimits();
+
+const num=id=>{const v=parseFloat($(id).value);return isFinite(v)&&v>0?v:0};
+const fmt=(v,d=0)=>v.toLocaleString(undefined,{maximumFractionDigits:d,minimumFractionDigits:d});
+const pct=v=>fmt(v*100,0)+"%";
+
+function maxMg(k,epi,wt,red){
+  const [pk,abs]=DRUGS[k][epi?"epi":"plain"];
+  return Math.min(pk*wt,abs)*(1-red);
+}
+
+function calc(){
+  const wt=num("wt"), red=Math.min(num("reduce"),90)/100;
+  $("exCustomWrap").hidden=$("exMg").value!=="custom";
+  const exMg=$("exMg").value==="custom"?Math.min(num("exCustom"),266):parseFloat($("exMg").value);
+  $("exAbsWrap").hidden=exMethod!=="abs"; $("exMaxHint").hidden=exMethod!=="max";
+  const exRel=Math.min(num("exRelease"),100)/100;
+  const exBupiMg=exMg*($("exBasis").value==="hcl"?300/266:1)*exRel;
+  const bupiPlainMax=wt?maxMg("bupi",false,wt,red):0;
+  const exFrac=exMethod==="max"?exMg/(266*(1-red)):(bupiPlainMax?exBupiMg/bupiPlainMax:0);
+  const exLabel=exMethod==="max"?`${pct(exFrac)} of the 266 mg Exparel max`:`${fmt(exBupiMg,0)} mg counted as bupivacaine`;
+
+  // block plain LA
+  const bK=$("bDrug").value,bEpi=$("bEpi").checked,bMg=num("bConc")*10*num("bVol");
+  const bMax=wt?maxMg(bK,bEpi,wt,red):0,bFrac=bMax?bMg/bMax:0;
+  $("bCalc").textContent=`${fmt(bMg,1)} mg ${DRUGS[bK].name.toLowerCase()} · ${wt?pct(bFrac):"–"} of its ${fmt(bMax)} mg max`;
+  // prior
+  const pK=$("pDrug").value,pEpi=$("pEpi").checked,pMg=num("pConc")*10*num("pVol");
+  const pMax=wt?maxMg(pK,pEpi,wt,red):0,pFrac=pMax&&pMg?pMg/pMax:0;
+  $("pCalc").textContent=pMg?`${fmt(pMg,1)} mg ${DRUGS[pK].name.toLowerCase()} · ${pct(pFrac)} of its ${fmt(pMax)} mg max`:"None entered";
+
+  // additional local / admixture
+  const mEpi=$("mEpi").checked;
+  const comps=[];
+  const p1=num("m1Parts"),p2=$("m2Drug").value?num("m2Parts"):0,pn=num("nsParts"),tot=p1+p2+pn;
+  if(p1&&num("m1Conc")) comps.push({k:$("m1Drug").value,conc:num("m1Conc"),parts:p1});
+  if(p2&&num("m2Conc")) comps.push({k:$("m2Drug").value,conc:num("m2Conc"),parts:p2});
+  let fracPerMl=0;
+  comps.forEach(c=>{c.mgPerMl=c.conc*10*c.parts/tot;c.max=wt?maxMg(c.k,mEpi,wt,red):0;c.fpm=c.max?c.mgPerMl/c.max:0;fracPerMl+=c.fpm;});
+  // merge duplicates for display
+  const desc=comps.map(c=>`${c.conc}% ${DRUGS[c.k].name.toLowerCase()}`);
+  const ratio=[p1,p2,pn].filter((v,i)=>v&&(i<2?(i===0?comps.some(c=>c.parts===p1):p2):true));
+  let name=desc.join(" + ");
+  if(pn) name+=" + saline";
+  const partsStr=[p1, $("m2Drug").value?p2:null, pn||null].filter(v=>v!==null&&v>0).join(" : ");
+  if(comps.length>1||pn) name+=` (${partsStr})`;
+  if(mEpi) name+=" with epinephrine";
+  $("mCalc").textContent=comps.length?"Per mL of mixture: "+comps.map(c=>`${fmt(c.mgPerMl,2)} mg ${DRUGS[c.k].name.toLowerCase()}`).join(" + "):"Enter at least one drug with a concentration";
+
+  const used=exFrac+bFrac+pFrac, remain=Math.max(0,1-used);
+  const maxMl=fracPerMl&&wt?remain/fracPerMl:0;
+  const maxMlR=Math.floor(maxMl);
+  $("maxMl").textContent=wt&&comps.length?fmt(maxMlR):"–";
+  $("big").classList.toggle("zero",wt&&comps.length&&maxMlR<=0);
+  $("mixName").textContent=name||"No mixture entered";
+
+  // mg table
+  let rows="";
+  comps.forEach(c=>{rows+=`<tr><td>${DRUGS[c.k].name} in ${fmt(maxMlR)} mL</td><td>${fmt(c.mgPerMl*maxMlR,0)} mg</td></tr>`;});
+  if(exMg) rows+=`<tr><td>Exparel: ${exLabel}</td><td>${pct(exFrac)}</td></tr>`;
+  rows+=`<tr><td>Budget already used</td><td>${pct(used)}</td></tr>`;
+  const bupiTotal=(bK==="bupi"?bMg:0)+(pK==="bupi"?pMg:0)+comps.filter(c=>c.k==="bupi").reduce((s,c)=>s+c.mgPerMl*maxMlR,0);
+  if(bupiTotal) rows+=`<tr><td>Total bupivacaine HCl (excl. Exparel)</td><td>${fmt(bupiTotal,0)} mg</td></tr>`;
+  $("mgTbl").innerHTML=rows;
+
+  // bar
+  const surg=maxMlR*fracPerMl;
+  const segs=[["Exparel",exFrac,"--exparel"],["Block admixture",bFrac,"--block"],["Other prior local",pFrac,"--prior"],["Available for additional local",surg,"--avail"]];
+  const scale=Math.max(1,used);
+  $("bar").innerHTML=segs.map(([n,v,c])=>`<span style="width:${Math.min(v/scale*100,100)}%;background:var(${c})" title="${n}"></span>`).join("");
+  let leg=segs.filter(s=>s[1]>0||s[0]==="Available for additional local").map(([n,v,c])=>`<span class="k"><i style="background:var(${c})"></i>${n}</span><b>${pct(v)}</b>`).join("");
+  if(used>1) leg+=`<span class="k" style="color:var(--over)"><i style="background:var(--over)"></i>Over limit</span><b style="color:var(--over)">${pct(used-1)}</b>`;
+  $("legend").innerHTML=leg;
+
+
+  // alerts
+  const A=[];
+  if(used>1) A.push(["danger","Over the combined limit already","Doses given so far exceed 100% of the additive budget. Do not add more local; monitor closely for LAST."]);
+  if(exMg&&comps.some(c=>c.k!=="bupi")) A.push(["warn","Non-bupivacaine local after Exparel","Lidocaine, ropivacaine and other non-bupivacaine agents can cause immediate bupivacaine release from Exparel if they reach the same tissue. With a distant block site this is less of a local concern, but the label still advises avoiding additional local anesthetics within 96 h."]);
+  if(exMg&&comps.length&&!A.some(a=>a[1].startsWith("Non"))) A.push(["warn","96-hour label caution","The Exparel label advises avoiding additional local anesthetics for 96 h. Additional dosing is a clinical judgment; this tool estimates the systemic budget only."]);
+  if(bK==="bupi"&&exMg&&bMg>exMg/2+0.01) A.push(["warn","Block admixture exceeds the 1:2 ratio",`Bupivacaine HCl ${fmt(bMg)} mg is more than half the Exparel dose (${fmt(exMg)} mg), which can alter Exparel's release.`]);
+  if(exMg&&exMethod==="abs"&&exRel<1) A.push(["warn",`Only ${fmt(exRel*100)}% of Exparel counted`,"You assumed part of the Exparel dose is not immediately available. No published standard sets this number, so make sure it matches your own or your department's judgment."]);
+  $("alerts").innerHTML=A.map(([t,h,b])=>`<div class="alert ${t}"><strong>${h}</strong>${b}</div>`).join("");
+}
+
+document.querySelectorAll("input,select").forEach(el=>{el.addEventListener("input",calc);el.addEventListener("change",calc)});
+$("exMethodSeg").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  exMethod=b.dataset.v;
+  $("exMethodSeg").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  calc();
+});
+calc();
+</script>
+
+</body>
+</html>
