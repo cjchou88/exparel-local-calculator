@@ -93,6 +93,28 @@ details summary{cursor:pointer;font-weight:700}
 .disclaimer strong{color:var(--ink)}
 footer h2{font-family:var(--f-display);font-weight:600;font-size:1.1rem;color:var(--ink);margin:0 0 6px;letter-spacing:.02em}
 footer p{margin:0 0 8px}
+:root{--c-bupi:#1f6fb2;--c-lb:#7a4fb0;--c-ropi:#1a8a6e;--c-lido:#b5761a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--c-bupi:#6fb2ef;--c-lb:#b997e8;--c-ropi:#58c9a8;--c-lido:#e8b052}}
+:root[data-theme="dark"]{--c-bupi:#6fb2ef;--c-lb:#b997e8;--c-ropi:#58c9a8;--c-lido:#e8b052}
+.pk-controls{display:flex;flex-wrap:wrap;gap:12px 24px}
+.pk-controls fieldset{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+.pk-controls legend{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:0;margin-bottom:4px;width:100%}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px}
+.pk-chart{width:100%;min-width:0}
+.pk-chart svg{display:block;width:100%;height:auto}
+.pk-key{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.8rem;color:var(--muted)}
+.pk-key span{display:inline-flex;align-items:center;gap:6px}
+.pk-table-wrap{overflow-x:auto}
+.pk-table{width:100%;min-width:640px;border-collapse:collapse;font-size:.84rem}
+.pk-table th{font-size:.78rem;color:var(--muted);text-align:left;padding:6px;border-bottom:1px solid var(--line)}
+.pk-table td{padding:6px;border-bottom:1px solid var(--line);vertical-align:top}
+.pk-table td:nth-child(3),.pk-table td:nth-child(4){font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pk-table tr{cursor:pointer}
+.pk-table tr.on td{background:var(--la-grey-soft)}
+.pk-table .grp td{background:transparent;font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);cursor:default;padding-top:12px}
+.pk-table .nt{color:var(--muted);font-size:.8rem}
+.pk-table a{color:var(--accent)}
+.pk-id{font-family:var(--f-mono);font-weight:600}
 footer{color:var(--muted);font-size:.8rem;max-width:80ch}
 @media (prefers-reduced-motion:no-preference){.bar span{transition:width .25s ease}}
 </style>
@@ -222,6 +244,37 @@ footer{color:var(--muted);font-size:.8rem;max-width:80ch}
   <div id="alerts" style="display:flex;flex-direction:column;gap:10px"></div>
 </aside>
 </div>
+
+<section class="panel pk" id="pk">
+  <h2>Published blood levels by injection site</h2>
+  <p class="hint">Each line is a separate study, shown side by side and not added together. Doses, patients and sampling differ between studies, so use this to see how timing and size of peaks compare, not to predict a patient's level.</p>
+  <div class="pk-controls">
+    <fieldset><legend>Site</legend>
+      <label class="chk" for="pkArm"><input id="pkArm" type="checkbox" checked> Brachial plexus</label>
+      <label class="chk" for="pkLeg"><input id="pkLeg" type="checkbox" checked> Lower extremity</label>
+      <label class="chk" for="pkWound"><input id="pkWound" type="checkbox" checked> Wound / periarticular</label>
+    </fieldset>
+    <fieldset><legend>Drug</legend>
+      <label class="chk" for="pkBupi"><input id="pkBupi" type="checkbox" checked> <i class="sw" style="background:var(--c-bupi)"></i>Bupivacaine HCl</label>
+      <label class="chk" for="pkLb"><input id="pkLb" type="checkbox" checked> <i class="sw" style="background:var(--c-lb)"></i>Exparel (± bupivacaine)</label>
+      <label class="chk" for="pkRopi"><input id="pkRopi" type="checkbox" checked> <i class="sw" style="background:var(--c-ropi)"></i>Ropivacaine</label>
+      <label class="chk" for="pkLido"><input id="pkLido" type="checkbox" checked> <i class="sw" style="background:var(--c-lido)"></i>Lidocaine</label>
+    </fieldset>
+    <fieldset><legend>Vertical scale</legend>
+      <label class="chk" for="pkFit"><input id="pkFit" type="checkbox"> Zoom to data (hide toxic lines above)</label>
+    </fieldset>
+  </div>
+  <div class="pk-chart" id="pkChart"></div>
+  <div class="pk-key">
+    <span><svg width="22" height="10" aria-hidden="true"><line x1="1" y1="5" x2="21" y2="5" stroke="currentColor" stroke-width="2"/></svg>Measured mean values</span>
+    <span><svg width="22" height="10" aria-hidden="true"><line x1="1" y1="5" x2="21" y2="5" stroke="currentColor" stroke-width="2" stroke-dasharray="4 3"/></svg>Decline from peak using reported half-life</span>
+    <span><svg width="22" height="10" aria-hidden="true"><line x1="1" y1="5" x2="21" y2="5" stroke="currentColor" stroke-width="1.5" stroke-dasharray="1 3"/></svg>Joins two reported peaks (shape between unknown)</span>
+    <span><svg width="14" height="12" aria-hidden="true"><rect x="1" y="1" width="12" height="10" fill="currentColor" opacity=".25" stroke="currentColor"/></svg>Reported range only</span>
+    <span>● block &nbsp;■ wound / periarticular</span>
+  </div>
+  <p class="hint">Toxic lines are venous total plasma levels at the first CNS symptoms in volunteers: bupivacaine 2.1 µg/mL (range 0.8–4.5) and ropivacaine 2.2 µg/mL (range 0.5–3.2), Knudsen 1997; lidocaine about 5 µg/mL, from reviews. Arterial thresholds in the same study were about 4 µg/mL. Exparel is measured as bupivacaine, so it shares the bupivacaine line. Tap a study to highlight it.</p>
+  <div class="pk-table-wrap"><table class="pk-table" id="pkTable"><thead><tr><th>#</th><th>Study</th><th>Peak, µg/mL</th><th>Time to peak</th><th>Source</th></tr></thead><tbody></tbody></table></div>
+</section>
 
 <footer id="disclaimer">
   <h2>Disclaimer</h2>
@@ -374,6 +427,121 @@ $("exMethodSeg").addEventListener("click",e=>{
   calc();
 });
 calc();
+/* ---- Published PK overlay (values as reported; µg/mL, hours) ---- */
+const PK=[
+ // Brachial plexus
+ {id:"A1",cat:"arm",drug:"ropi",name:"Interscalene, ropivacaine 0.75% 3.75 mg/kg (~280 mg at 75 kg)",note:"Arterial samples, which read higher than venous. n=20.",peaks:[[13.4/60,3.30]],cite:"Rettig 2007, Anaesthesia",url:"https://repub.eur.nl/pub/58836"},
+ {id:"A2",cat:"arm",drug:"ropi",name:"Supraclavicular (subclavian perivascular), ropivacaine 0.5% 190 mg, no epi",note:"Venous. n=8. With epinephrine 1:200,000: 1.6 µg/mL at 0.75 h.",peaks:[[0.88,1.3]],cite:"Hickey 1990, Can J Anaesth",url:"https://link.springer.com/article/10.1007/BF03006624"},
+ {id:"A3",cat:"arm",drug:"ropi",name:"Brachial plexus, ropivacaine 0.75% 300 mg",note:"n=10. Approach not stated.",peaks:[[0.9,2.3]],t12:6.8,cite:"Ropivacaine US label, Table 7",url:"https://baxterpi.com/pi-pdf/Ropivacaine%20PI-0719001756.pdf"},
+ {id:"A4",cat:"arm",drug:"bupi",name:"Interscalene, bupivacaine 0.75% 20–28 mL (~150–210 mg) with epi",note:"n=12. A catheter infusion followed, so only the first hour is shown.",pts:[[0.5,1.63],[1,1.38]],cite:"Rosenberg 1991, Br J Anaesth",url:"https://academic.oup.com/bja/article/66/1/25/263536"},
+ {id:"A5",cat:"arm",drug:"lb",name:"Interscalene, Exparel 133 mg",note:"Total shoulder arthroplasty. n=12. Levels can persist 120 h.",peaks:[[48,0.207]],t12:11,cite:"Exparel US label, Table 3",url:"https://www.accessdata.fda.gov/drugsatfda_docs/label/2018/022496s009lbledt.pdf"},
+ {id:"A6",cat:"arm",drug:"lb",name:"Interscalene or supraclavicular, Exparel 266 mg",note:"n=12. Cohort stopped because of the delayed peak.",peaks:[[48,0.469]],t12:14,cite:"FDA advisory committee slides, 2018 (Study 402-C-327)",url:"https://fda.gov/media/111376/download"},
+ // Lower extremity
+ {id:"L1",cat:"leg",drug:"bupi",name:"Popliteal, bupivacaine HCl 100 mg (20 mL)",note:"Bunionectomy. n=10.",peaks:[[0.8,0.617]],t12:10.4,cite:"Sessler 2025, J Clin Pharmacol",url:"https://rcastoragev2.blob.core.windows.net/02d5541109e1a829633b6a04112b44d1/JCPH-65-441.PMC11937984.pdf"},
+ {id:"L2",cat:"leg",drug:"lb",name:"Popliteal, Exparel 133 mg + bupivacaine 50 mg",note:"n=9. Early and late peaks.",peaks:[[0.7,0.255],[24,0.127]],t12:33.1,cite:"Sessler 2025, J Clin Pharmacol",url:"https://rcastoragev2.blob.core.windows.net/02d5541109e1a829633b6a04112b44d1/JCPH-65-441.PMC11937984.pdf"},
+ {id:"L3",cat:"leg",drug:"lb",name:"Popliteal, Exparel 266 mg",note:"n=10. Early and late peaks.",peaks:[[1.0,0.105],[65,0.239]],t12:18.8,cite:"Sessler 2025, J Clin Pharmacol",url:"https://rcastoragev2.blob.core.windows.net/02d5541109e1a829633b6a04112b44d1/JCPH-65-441.PMC11937984.pdf"},
+ {id:"L4",cat:"leg",drug:"lb",name:"Popliteal, Exparel 266 mg + bupivacaine 50 mg",note:"n=10. Highest single level about 0.8 µg/mL.",peaks:[[0.6,0.451],[59,0.313]],t12:23.0,cite:"Sessler 2025, J Clin Pharmacol",url:"https://rcastoragev2.blob.core.windows.net/02d5541109e1a829633b6a04112b44d1/JCPH-65-441.PMC11937984.pdf"},
+ {id:"L5",cat:"leg",drug:"bupi",name:"Adductor canal, bupivacaine 50 mg",note:"TKA. n=21. Conference poster.",peaks:[[0.55,0.3154]],cite:"Gadsden 2023, ASRA/AOAO poster",url:"https://medinfo.pacira.com/AOAO_2023_LB_for_TKA_Study_335_(Gadsden)_FINAL.pdf"},
+ {id:"L6",cat:"leg",drug:"lb",name:"Adductor canal, Exparel 133 mg + bupivacaine 50 mg",note:"TKA. n=24. Conference poster. Other drug at other sites not stated.",peaks:[[0.63,0.467],[60.9,0.3348]],cite:"Gadsden 2023, ASRA/AOAO poster",url:"https://medinfo.pacira.com/AOAO_2023_LB_for_TKA_Study_335_(Gadsden)_FINAL.pdf"},
+ {id:"L7",cat:"leg",drug:"lb",name:"Femoral (proxy for adductor canal), Exparel 133 mg",note:"TKA. n=19.",peaks:[[72,0.282]],t12:29.0,cite:"Hadzic 2016, Anesthesiology",url:"https://escholarship.org/content/qt5rv5z8cx/qt5rv5z8cx.pdf"},
+ {id:"L8",cat:"leg",drug:"lb",name:"Femoral (proxy), Exparel 266 mg",note:"TKA. n=21. Highest single level 0.83 µg/mL.",peaks:[[72,0.577]],t12:18.2,cite:"Hadzic 2016, Anesthesiology",url:"https://escholarship.org/content/qt5rv5z8cx/qt5rv5z8cx.pdf"},
+ {id:"L9",cat:"leg",drug:"ropi",name:"Femoral (proxy), ropivacaine 0.5% 100 mg",note:"n=16. Sampling stopped at 80 min.",peaks:[[33.75/60,0.364]],cite:"Mouzi 2016, Anaesth Crit Care Pain Med",url:"https://www.em-consulte.com/article/1034271/resume/plasma-concentrations-of-ropivacaine-following-ult"},
+ {id:"L10",cat:"leg",drug:"ropi",name:"Adductor canal ropivacaine 100 mg + periarticular ropivacaine 270 mg, with epi",note:"TKA. n=7. Patients under 80 kg excluded.",range:{t:[4,8],c:[0.46,1.00]},cite:"Koniuch 2019, Reg Anesth Pain Med",url:"https://rapm.bmj.com/content/44/4/478"},
+ // Wound / periarticular
+ {id:"W1",cat:"wound",drug:"lb",name:"Hemorrhoidectomy field block, Exparel 266 mg",note:"n=25. Early peak from a vascular site.",peaks:[[0.5,0.867]],t12:24,cite:"Exparel US label, Table 3",url:"https://www.accessdata.fda.gov/drugsatfda_docs/label/2018/022496s009lbledt.pdf"},
+ {id:"W2",cat:"wound",drug:"lb",name:"Bunionectomy infiltration, Exparel 106 mg",note:"n=26.",peaks:[[2,0.166]],t12:34,cite:"Exparel US label, Table 3",url:"https://www.accessdata.fda.gov/drugsatfda_docs/label/2018/022496s009lbledt.pdf"},
+ {id:"W3",cat:"wound",drug:"lb",name:"TKA periarticular, Exparel 266 mg + bupivacaine 0.25% 125 mg with epi",note:"n=40. Bar shows the range of individual peaks, which occurred from 10 min to 48 h. Mean 0.55 µg/mL at 48 h and still rising.",range:{t:[48,48],c:[0.17,1.2],whisker:true},pts:[[48,0.55]],cite:"Buys 2017, Reg Anesth Pain Med",url:"https://rapm.bmj.com/content/42/5/582"},
+ {id:"W4",cat:"wound",drug:"bupi",name:"Inguinal hernia infiltration, bupivacaine 0.25% 175 mg",note:"n=16. Mean Cmax 0.64 µg/mL (range 0.28–1.14).",pts:[[0.5,0.505],[1,0.578],[1.5,0.556],[2,0.519],[3,0.421],[36,0.119],[96,0.0054]],cite:"Leiman 2021, Adv Ther",url:"https://rcastoragev2.blob.core.windows.net/a665300b7eba338c66f42276ed144515/PMC7854444.pdf"},
+ {id:"W5",cat:"wound",drug:"bupi",name:"Pre-peritoneal wound bolus, bupivacaine 0.25% 75 mg",note:"Laparotomy. Arterial. n=10. Sampling stopped at 80 min.",pts:[[1/3,0.094],[2/3,0.100],[1,0.108],[4/3,0.095]],cite:"Mungroop 2017, PLoS ONE",url:"https://rcastoragev2.blob.core.windows.net/56fbf36434076719c8d30725e6314039/PMC5470670.pdf"},
+ {id:"W6",cat:"wound",drug:"ropi",name:"TKA periarticular, ropivacaine 270 mg with epi",note:"n=7. Patients under 80 kg excluded.",range:{t:[4,24],c:[0.23,0.75]},cite:"Koniuch 2019, Reg Anesth Pain Med",url:"https://rapm.bmj.com/content/44/4/478"},
+ {id:"W7",cat:"wound",drug:"ropi",name:"TKA periarticular, ropivacaine 300 mg with epi 5 µg/mL",note:"n=15. Median peak 0.57 µg/mL.",range:{t:[6,24],c:[0.32,0.88],mid:0.57},cite:"Miller 2018, Reg Anesth Pain Med",url:"https://rapm.bmj.com/content/43/4/347"},
+ {id:"W8",cat:"wound",drug:"ropi",name:"TKA periarticular, ropivacaine 300 mg + ketorolac 30 mg + epi",note:"n=20. Mean peak 0.81 µg/mL. Venous or arterial samples.",range:{t:[4,6],c:[0.435,1.735],mid:0.813},cite:"Affas 2012, Scand J Pain",url:"https://www.degruyterbrill.com/document/doi/10.1016/j.sjpain.2011.09.001/html"},
+ {id:"W9",cat:"wound",drug:"lido",name:"Mohs subcutaneous, lidocaine 1% with epi (mean ~150 mg)",note:"n=20. Most levels undetectable; highest 0.3 µg/mL over ~5 h.",range:{t:[0.25,5],c:[0,0.3]},cite:"Alam 2010, J Am Acad Dermatol",url:"https://www.em-consulte.com/en/article/806015/iconosup"},
+];
+const PK_TOX={bupi:{v:2.1,l:"Bupivacaine / Exparel 2.1"},ropi:{v:2.2,l:"Ropivacaine 2.2"},lido:{v:5,l:"Lidocaine ~5"}};
+const PK_COL={bupi:"--c-bupi",lb:"--c-lb",ropi:"--c-ropi",lido:"--c-lido"};
+const PK_CAT={arm:"Brachial plexus",leg:"Lower extremity",wound:"Wound / periarticular"};
+let pkHi=null;
+const tLo=0.1,tHi=120;
+function pkVisible(){
+  const cats={arm:$("pkArm").checked,leg:$("pkLeg").checked,wound:$("pkWound").checked};
+  const drugs={bupi:$("pkBupi").checked,lb:$("pkLb").checked,ropi:$("pkRopi").checked,lido:$("pkLido").checked};
+  return PK.filter(s=>cats[s.cat]&&drugs[s.drug]);
+}
+function fmtT(h){return h<1?`${Math.round(h*60)} min`:(h<10&&Math.abs(h-Math.round(h))>0.05?`${fmt(h,1)} h`:`${fmt(h,0)} h`)}
+function pkDraw(){
+  const el=$("pkChart"),W=Math.max(320,Math.min(1080,el.clientWidth||800)),narrow=W<560;
+  const H=narrow?300:380,m={l:narrow?40:50,r:narrow?10:16,t:14,b:narrow?40:44};
+  const vis=pkVisible(),fit=$("pkFit").checked;
+  let dmax=0;vis.forEach(s=>{(s.peaks||[]).forEach(p=>dmax=Math.max(dmax,p[1]));(s.pts||[]).forEach(p=>dmax=Math.max(dmax,p[1]));if(s.range)dmax=Math.max(dmax,s.range.c[1]);});
+  const toxKeys=[...new Set(vis.map(s=>s.drug==="lb"?"bupi":s.drug))];
+  let tmax=fit?0:Math.max(0,...toxKeys.filter(k=>k!=="lido").map(k=>PK_TOX[k].v));
+  const yMax=niceMax(Math.max(dmax,tmax,0.2)*1.08);
+  const X=t=>m.l+(Math.log10(Math.max(t,tLo))-Math.log10(tLo))/(Math.log10(tHi)-Math.log10(tLo))*(W-m.l-m.r);
+  const Y=c=>H-m.b-(c/yMax)*(H-m.t-m.b);
+  const fs=narrow?10:11;
+  let g=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Plasma local anesthetic levels over time from published studies" font-family="var(--f-body)" font-size="${fs}">`;
+  // grid
+  const yStep=niceStep(yMax/5);
+  for(let v=0;v<=yMax+1e-9;v+=yStep){g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${m.l-6}" y="${Y(v)+4}" text-anchor="end" fill="var(--muted)">${fmt(v,yStep<0.1?2:1)}</text>`;}
+  const xt=narrow?[[1/6,"10m"],[0.5,"30m"],[1,"1h"],[4,"4h"],[12,"12h"],[24,"24h"],[48,"48h"],[96,"96h"]]:[[1/6,"10 min"],[0.5,"30 min"],[1,"1 h"],[2,"2 h"],[4,"4 h"],[8,"8 h"],[12,"12 h"],[24,"24 h"],[48,"48 h"],[72,"72 h"],[96,"96 h"]];
+  xt.forEach(([t,l])=>{g+=`<line x1="${X(t)}" x2="${X(t)}" y1="${m.t}" y2="${H-m.b}" stroke="var(--line)" stroke-width="1" opacity=".6"/><text x="${X(t)}" y="${H-m.b+16}" text-anchor="middle" fill="var(--muted)">${l}</text>`;});
+  g+=`<text x="${(m.l+W-m.r)/2}" y="${H-6}" text-anchor="middle" fill="var(--muted)">Time after injection (log scale)</text>`;
+  g+=`<text transform="translate(12 ${(m.t+H-m.b)/2}) rotate(-90)" text-anchor="middle" fill="var(--muted)">Plasma level (µg/mL)</text>`;
+  // thresholds
+  let above=0,onIdx=0;
+  toxKeys.slice().sort((a,b)=>PK_TOX[a].v-PK_TOX[b].v).forEach(k=>{const v=PK_TOX[k].v,col=`var(${PK_COL[k]})`;
+    if(v<=yMax){const dy=onIdx++%2===0?fs+4:-5;g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="${col}" stroke-width="1.5" stroke-dasharray="7 4"/><text x="${W-m.r-4}" y="${Y(v)+dy}" text-anchor="end" fill="${col}" font-weight="700">${PK_TOX[k].l} µg/mL${narrow?"":" (CNS symptoms)"}</text>`;}
+    else{g+=`<text x="${W-m.r-4}" y="${m.t+10+(above++)*13}" text-anchor="end" fill="${col}" font-weight="700">${PK_TOX[k].l} µg/mL, above chart ↑</text>`;}
+  });
+  // series
+  const order=vis.slice().sort((a,b)=>(a.id===pkHi)-(b.id===pkHi));
+  order.forEach(s=>{
+    const col=`var(${PK_COL[s.drug]})`,op=pkHi&&pkHi!==s.id?0.15:1,sw=pkHi===s.id?3:2;
+    let p=`<g opacity="${op}" data-id="${s.id}">`;
+    if(s.range&&s.range.whisker){const r=s.range,x=X(r.t[0]);p+=`<line x1="${x}" x2="${x}" y1="${Y(r.c[0])}" y2="${Y(r.c[1])}" stroke="${col}" stroke-width="2"/><line x1="${x-5}" x2="${x+5}" y1="${Y(r.c[0])}" y2="${Y(r.c[0])}" stroke="${col}" stroke-width="2"/><line x1="${x-5}" x2="${x+5}" y1="${Y(r.c[1])}" y2="${Y(r.c[1])}" stroke="${col}" stroke-width="2"/>`;}
+    else if(s.range){const r=s.range;p+=`<rect x="${X(r.t[0])}" y="${Y(r.c[1])}" width="${Math.max(3,X(r.t[1])-X(r.t[0]))}" height="${Math.max(2,Y(r.c[0])-Y(r.c[1]))}" fill="${col}" fill-opacity=".18" stroke="${col}" stroke-width="1.2"/>`;
+      if(r.mid!=null)p+=`<line x1="${X(r.t[0])}" x2="${X(r.t[1])}" y1="${Y(r.mid)}" y2="${Y(r.mid)}" stroke="${col}" stroke-width="2"/>`;}
+    if(s.pts){p+=`<polyline fill="none" stroke="${col}" stroke-width="${sw}" points="${s.pts.map(q=>`${X(q[0])},${Y(q[1])}`).join(" ")}"/>`;
+      s.pts.forEach(q=>p+=marker(s,X(q[0]),Y(q[1]),col,3));}
+    if(s.peaks){
+      if(s.peaks.length>1){p+=`<polyline fill="none" stroke="${col}" stroke-width="1.5" stroke-dasharray="1 3" points="${s.peaks.map(q=>`${X(q[0])},${Y(q[1])}`).join(" ")}"/>`;}
+      const last=s.peaks[s.peaks.length-1];
+      if(s.t12){const pts=[];for(let t=last[0];t<=tHi;t*=1.08){const c=last[1]*Math.pow(.5,(t-last[0])/s.t12);if(c<yMax*0.004)break;pts.push(`${X(t)},${Y(c)}`);}
+        if(pts.length>1)p+=`<polyline fill="none" stroke="${col}" stroke-width="${sw}" stroke-dasharray="6 4" points="${pts.join(" ")}"/>`;}
+      s.peaks.forEach(q=>p+=marker(s,X(q[0]),Y(q[1]),col,4.5));
+    }
+    // label
+    const lp=s.peaks?s.peaks.reduce((a,b)=>b[1]>a[1]?b:a):s.pts?s.pts.reduce((a,b)=>b[1]>a[1]?b:a):[s.range.t[1],s.range.c[1]];
+    const lx=s.range&&!s.peaks&&!s.pts?X(s.range.t[0]):X(lp[0]);
+    p+=`<text x="${lx+6}" y="${Y(lp[1])-6}" fill="${col}" font-weight="700" font-size="${fs-1}">${s.id}</text>`;
+    g+=p+`</g>`;
+  });
+  g+=`</svg>`;el.innerHTML=g;
+  // table
+  let rows="",lastCat="";
+  vis.forEach(s=>{
+    if(s.cat!==lastCat){rows+=`<tr class="grp"><td colspan="5">${PK_CAT[s.cat]}</td></tr>`;lastCat=s.cat;}
+    let peak,tp;
+    if(s.peaks){peak=s.peaks.map(q=>fmt(q[1],2)).join(" → ");tp=s.peaks.map(q=>fmtT(q[0])).join(" → ");}
+    else if(s.range&&s.range.whisker){peak=`${fmt(s.range.c[0],2)}–${fmt(s.range.c[1],2)} (mean ${fmt(s.pts[0][1],2)} at 48 h)`;tp="10 min–48 h";}
+    else if(s.range){peak=`${fmt(s.range.c[0],2)}–${fmt(s.range.c[1],2)}${s.range.mid!=null?` (${fmt(s.range.mid,2)})`:""}`;tp=`${fmtT(s.range.t[0])}–${fmtT(s.range.t[1])}`;}
+    else{const q=s.pts.reduce((a,b)=>b[1]>a[1]?b:a);peak=fmt(q[1],2);tp=fmtT(q[0]);}
+    if(s.t12)tp+=` · t½ ${fmt(s.t12,1)} h`;
+    rows+=`<tr data-id="${s.id}" tabindex="0" class="${pkHi===s.id?"on":""}"><td><span class="pk-id" style="color:var(${PK_COL[s.drug]})">${s.id}</span></td><td>${s.name}<div class="nt">${s.note}</div></td><td>${peak}</td><td>${tp}</td><td><a href="${s.url}" target="_blank" rel="noopener">${s.cite}</a></td></tr>`;
+  });
+  if(!vis.length)rows=`<tr><td colspan="5" class="nt">No studies match the selected site and drug.</td></tr>`;
+  document.querySelector("#pkTable tbody").innerHTML=rows;
+}
+function marker(s,x,y,col,r){return s.cat==="wound"?`<rect x="${x-r}" y="${y-r}" width="${2*r}" height="${2*r}" fill="${col}" stroke="var(--panel)" stroke-width="1"/>`:`<circle cx="${x}" cy="${y}" r="${r}" fill="${col}" stroke="var(--panel)" stroke-width="1"/>`}
+function niceStep(x){const p=Math.pow(10,Math.floor(Math.log10(x))),n=x/p;return (n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*p}
+function niceMax(x){const s=niceStep(x/5);return Math.ceil(x/s)*s}
+["pkArm","pkLeg","pkWound","pkBupi","pkLb","pkRopi","pkLido","pkFit"].forEach(id=>$(id).addEventListener("change",pkDraw));
+$("pkTable").addEventListener("click",e=>{if(e.target.closest("a"))return;const tr=e.target.closest("tr[data-id]");if(!tr)return;pkHi=pkHi===tr.dataset.id?null:tr.dataset.id;pkDraw();});
+$("pkTable").addEventListener("keydown",e=>{if(e.key!=="Enter"&&e.key!==" ")return;const tr=e.target.closest("tr[data-id]");if(!tr)return;e.preventDefault();pkHi=pkHi===tr.dataset.id?null:tr.dataset.id;pkDraw();});
+$("pkChart").addEventListener("click",e=>{const g=e.target.closest("g[data-id]");pkHi=g&&pkHi!==g.dataset.id?g.dataset.id:null;pkDraw();});
+let pkRT;window.addEventListener("resize",()=>{clearTimeout(pkRT);pkRT=setTimeout(pkDraw,120)});
+pkDraw();
 </script>
 
 </body>
