@@ -87,6 +87,10 @@ details summary{cursor:pointer;font-weight:700}
 .limits th,.limits td{padding:6px;border-bottom:1px solid var(--line);text-align:left}
 .limits th{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
 .limits input{padding:5px 7px;font-size:.9rem}
+.disclaimer{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--la-grey);border-radius:8px;padding:12px 14px;font-size:.86rem;color:var(--muted);max-width:none}
+.disclaimer strong{color:var(--ink)}
+footer h2{font-family:var(--f-display);font-weight:600;font-size:1.1rem;color:var(--ink);margin:0 0 6px;letter-spacing:.02em}
+footer p{margin:0 0 8px}
 footer{color:var(--muted);font-size:.8rem;max-width:80ch}
 @media (prefers-reduced-motion:no-preference){.bar span{transition:width .25s ease}}
 </style>
@@ -98,6 +102,7 @@ footer{color:var(--muted);font-size:.8rem;max-width:80ch}
 <header>
   <h1>How Much Local After Exparel Block</h1>
   <p class="lede">After a block with Exparel, work out how many mL of additional local anesthetic or admixture can still be given within combined toxic-dose limits. Uses the additive method: each drug's dose as a fraction of its own maximum, summed, must stay at or below 100%.</p>
+  <p class="disclaimer" role="note"><strong>For licensed clinicians only.</strong> This is an educational estimate, not medical advice. Verify every result against the product labels and your institution's protocol before giving any drug. <a href="#disclaimer">Full disclaimer</a></p>
 </header>
 
 <div class="grid">
@@ -209,7 +214,15 @@ footer{color:var(--muted);font-size:.8rem;max-width:80ch}
 </aside>
 </div>
 
-<footer>Decision support only. Verify every number and apply clinical judgment; limits vary by source, site vascularity, and patient. Keep 20% lipid emulsion available and monitor for LAST (perioral numbness, tinnitus, agitation, seizures, arrhythmia) for the duration of absorption.</footer>
+<footer id="disclaimer">
+  <h2>Disclaimer</h2>
+  <p><strong>Intended users.</strong> This calculator is intended only for licensed anesthesia and surgical clinicians who are trained in local anesthetic dosing and in recognizing and treating local anesthetic systemic toxicity (LAST).</p>
+  <p><strong>Not medical advice.</strong> The tool gives a mathematical estimate based on the inputs and limits you enter. It does not replace clinical judgment, the FDA prescribing information, or your institution's policies. It is not FDA-cleared and has not been clinically validated.</p>
+  <p><strong>Limits of the method.</strong> Maximum doses differ by source, injection site, vascularity, patient age, weight, organ function, and other conditions. The additive method and the Exparel counting options are simplifications. The Exparel label advises avoiding additional local anesthetics within 96 hours of administration; any additional dosing is the treating clinician's decision.</p>
+  <p><strong>Your responsibility.</strong> You are responsible for checking every number and for all treatment decisions. Keep 20% lipid emulsion and resuscitation equipment available and monitor for LAST: perioral numbness, tinnitus, agitation, seizures, and arrhythmia.</p>
+  <p><strong>No warranty.</strong> This tool is provided "as is," without warranty of any kind. The author accepts no liability for any outcome arising from its use.</p>
+  <p><strong>Privacy and affiliation.</strong> No data you enter is stored or sent anywhere; all calculations run in your browser. EXPAREL is a registered trademark of Pacira BioSciences, Inc. This tool is not affiliated with or endorsed by Pacira.</p>
+</footer>
 </div>
 
 <script>
