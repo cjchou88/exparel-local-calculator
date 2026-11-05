@@ -29,7 +29,9 @@
   --exparel:#a58bd6; --block:#4fb3d6; --prior:#e0a94a; --avail:#5cc28a; --over:#ff7a6b;
   --warn-bg:#3a2f12; --warn-ink:#f5d58a; --danger-bg:#3d1a16; --danger-ink:#ffb3a8; color-scheme:dark}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+[hidden]{display:none!important}
+.stack{display:flex;flex-direction:column;gap:10px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px}
 .wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
 header{display:flex;flex-direction:column;gap:6px}
@@ -132,14 +134,14 @@ footer{color:var(--muted);font-size:.8rem;max-width:80ch}
         <button type="button" data-v="abs" aria-pressed="false">As bupivacaine mg (weight-based)</button>
       </div>
       <p class="hint" id="exMaxHint">The Exparel dose counts as a share of its own 266 mg maximum. For example, 133 mg uses 50% of the budget.</p>
-      <div id="exAbsWrap" hidden style="display:flex;flex-direction:column;gap:10px">
+      <div id="exAbsWrap" class="stack" hidden>
         <div class="row">
           <label class="f" for="exBasis">Count Exparel as
             <select id="exBasis"><option value="raw">Raw mg (133 mg = 133 mg)</option><option value="hcl">Bupivacaine HCl equivalent (133 mg = 150 mg)</option></select>
           </label>
-          <label class="f" for="exRelease">Released to bloodstream (%)<input id="exRelease" type="number" min="0" max="100" step="5" value="100"></label>
+          <label class="f" for="exRelease">Counted as plain bupivacaine (%)<input id="exRelease" type="number" min="0" max="100" step="5" value="100"></label>
         </div>
-        <p class="hint">Enter the share of the Exparel dose you consider immediately available systemically. 100% is the most conservative choice. That share counts against the weight-based plain bupivacaine limit.</p>
+        <p class="hint">The share of the Exparel dose you treat as if it were the same dose of plain bupivacaine. Plain bupivacaine is not absorbed instantly either; its maximum dose already allows for normal absorption from the injection site. 100% treats Exparel exactly like plain bupivacaine, the most conservative choice. Lower values reflect your judgment that liposomal release adds less to peak blood levels.</p>
       </div>
     </div>
     <div class="sub">
@@ -336,7 +338,7 @@ function calc(){
   if(exMg&&comps.some(c=>c.k!=="bupi")) A.push(["warn","Non-bupivacaine local after Exparel","Lidocaine, ropivacaine and other non-bupivacaine agents can cause immediate bupivacaine release from Exparel if they reach the same tissue. With a distant block site this is less of a local concern, but the label still advises avoiding additional local anesthetics within 96 h."]);
   if(exMg&&comps.length&&!A.some(a=>a[1].startsWith("Non"))) A.push(["warn","96-hour label caution","The Exparel label advises avoiding additional local anesthetics for 96 h. Additional dosing is a clinical judgment; this tool estimates the systemic budget only."]);
   if(bK==="bupi"&&exMg&&bMg>exMg/2+0.01) A.push(["warn","Block admixture exceeds the 1:2 ratio",`Bupivacaine HCl ${fmt(bMg)} mg is more than half the Exparel dose (${fmt(exMg)} mg), which can alter Exparel's release.`]);
-  if(exMg&&exMethod==="abs"&&exRel<1) A.push(["warn",`Only ${fmt(exRel*100)}% of Exparel counted`,"You assumed part of the Exparel dose is not immediately available. No published standard sets this number, so make sure it matches your own or your department's judgment."]);
+  if(exMg&&exMethod==="abs"&&exRel<1) A.push(["warn",`Only ${fmt(exRel*100)}% of Exparel counted as plain bupivacaine`,"You chose to count less than the full Exparel dose as plain bupivacaine. No published standard sets this number, so make sure it matches your own or your department's judgment."]);
   $("alerts").innerHTML=A.map(([t,h,b])=>`<div class="alert ${t}"><strong>${h}</strong>${b}</div>`).join("");
 }
 
