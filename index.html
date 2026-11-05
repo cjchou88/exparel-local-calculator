@@ -168,21 +168,28 @@ footer{color:var(--muted);font-size:.8rem;max-width:80ch}
 
   <section class="panel">
     <h2><span class="step">3</span>Additional local or admixture</h2>
-    <p class="hint">Enter the recipe by parts (for example 1 : 1). Saline parts dilute the mix.</p>
+    <label class="f" for="preset">Preset
+      <select id="preset">
+        <option value="custom">Custom mix</option>
+        <option value="reckLido">RECK 50 mL + 1% lidocaine (30 mL : 20 mL)</option>
+        <option value="reck">RECK 50 mL alone</option>
+      </select>
+    </label>
+    <p class="hint" id="presetHint">Or enter a recipe by parts (for example 1 : 1). Saline parts dilute the mix.</p>
     <div class="mixrow">
       <label class="f drug" for="m1Drug">Drug A<select id="m1Drug"></select></label>
-      <label class="f" for="m1Conc">Conc (%)<input id="m1Conc" type="number" min="0" step="0.025" value="0.25"></label>
+      <label class="f" for="m1Conc">Conc (%)<input id="m1Conc" type="number" min="0" step="any" value="0.25"></label>
       <label class="f" for="m1Parts">Parts<input id="m1Parts" type="number" min="0" step="1" value="1"></label>
     </div>
     <div class="mixrow">
       <label class="f drug" for="m2Drug">Drug B<select id="m2Drug"></select></label>
-      <label class="f" for="m2Conc">Conc (%)<input id="m2Conc" type="number" min="0" step="0.025" value="1"></label>
+      <label class="f" for="m2Conc">Conc (%)<input id="m2Conc" type="number" min="0" step="any" value="1"></label>
       <label class="f" for="m2Parts">Parts<input id="m2Parts" type="number" min="0" step="1" value="1"></label>
     </div>
     <div class="row">
       <label class="f" for="nsParts">Saline parts<input id="nsParts" type="number" min="0" step="1" value="0"></label>
     </div>
-    <label class="chk" for="mEpi"><input id="mEpi" type="checkbox" checked> Mixture contains epinephrine</label>
+    <label class="chk" for="mEpi"><input id="mEpi" type="checkbox" checked> Use with-epinephrine dose limits</label>
     <div class="calc" id="mCalc"></div>
   </section>
 
@@ -236,6 +243,13 @@ const DRUGS={
 };
 const $=id=>document.getElementById(id);
 let exMethod="max";
+const RECK={ropiPct:0.246,ketoMgPerMl:15/50,cloMcgPerMl:40/50,epiMcgPerMl:250/50};
+function applyPreset(){
+  const v=$("preset").value; if(v==="custom")return;
+  $("m1Drug").value="ropi";$("m1Conc").value=RECK.ropiPct;$("nsParts").value=0;
+  if(v==="reckLido"){$("m1Parts").value=30;$("m2Drug").value="lido";$("m2Conc").value=1;$("m2Parts").value=20;$("mEpi").checked=false;}
+  else{$("m1Parts").value=50;$("m2Drug").value="";$("m2Parts").value=0;$("mEpi").checked=true;}
+}
 
 function fillSelect(sel,def,allowNone){
   const el=$(sel); el.innerHTML="";
@@ -304,6 +318,9 @@ function calc(){
   const partsStr=[p1, $("m2Drug").value?p2:null, pn||null].filter(v=>v!==null&&v>0).join(" : ");
   if(comps.length>1||pn) name+=` (${partsStr})`;
   if(mEpi) name+=" with epinephrine";
+  const preset=$("preset").value, isReck=preset!=="custom";
+  const reckFrac=isReck&&tot?p1/tot:0;
+  if(isReck) name=preset==="reckLido"?`RECK + 1% lidocaine (${p1} : ${p2} mL)`:"RECK (50 mL bag)";
   $("mCalc").textContent=comps.length?"Per mL of mixture: "+comps.map(c=>`${fmt(c.mgPerMl,2)} mg ${DRUGS[c.k].name.toLowerCase()}`).join(" + "):"Enter at least one drug with a concentration";
 
   const used=exFrac+bFrac+pFrac, remain=Math.max(0,1-used);
@@ -320,6 +337,10 @@ function calc(){
   rows+=`<tr><td>Budget already used</td><td>${pct(used)}</td></tr>`;
   const bupiTotal=(bK==="bupi"?bMg:0)+(pK==="bupi"?pMg:0)+comps.filter(c=>c.k==="bupi").reduce((s,c)=>s+c.mgPerMl*maxMlR,0);
   if(bupiTotal) rows+=`<tr><td>Total bupivacaine HCl (excl. Exparel)</td><td>${fmt(bupiTotal,0)} mg</td></tr>`;
+  if(isReck){const v=maxMlR*reckFrac;
+    rows+=`<tr><td>Ketorolac in ${fmt(maxMlR)} mL</td><td>${fmt(v*RECK.ketoMgPerMl,1)} mg</td></tr>`;
+    rows+=`<tr><td>Clonidine in ${fmt(maxMlR)} mL</td><td>${fmt(v*RECK.cloMcgPerMl,0)} mcg</td></tr>`;
+    rows+=`<tr><td>Epinephrine in ${fmt(maxMlR)} mL</td><td>${fmt(v*RECK.epiMcgPerMl,0)} mcg</td></tr>`;}
   $("mgTbl").innerHTML=rows;
 
   // bar
@@ -334,6 +355,7 @@ function calc(){
 
   // alerts
   const A=[];
+  if(isReck) A.push(["warn","Check the RECK bag label","Preset assumes the 50 mL bag: ropivacaine 123 mg (0.246%), epinephrine 0.25 mg, clonidine 40 mcg, ketorolac 15 mg. Compounded formulas vary, so confirm against your bag. Count the ketorolac toward the patient's total NSAID dose."]);
   if(used>1) A.push(["danger","Over the combined limit already","Doses given so far exceed 100% of the additive budget. Do not add more local; monitor closely for LAST."]);
   if(exMg&&comps.some(c=>c.k!=="bupi")) A.push(["warn","Non-bupivacaine local after Exparel","Lidocaine, ropivacaine and other non-bupivacaine agents can cause immediate bupivacaine release from Exparel if they reach the same tissue. With a distant block site this is less of a local concern, but the label still advises avoiding additional local anesthetics within 96 h."]);
   if(exMg&&comps.length&&!A.some(a=>a[1].startsWith("Non"))) A.push(["warn","96-hour label caution","The Exparel label advises avoiding additional local anesthetics for 96 h. Additional dosing is a clinical judgment; this tool estimates the systemic budget only."]);
@@ -343,6 +365,8 @@ function calc(){
 }
 
 document.querySelectorAll("input,select").forEach(el=>{el.addEventListener("input",calc);el.addEventListener("change",calc)});
+$("preset").addEventListener("change",()=>{applyPreset();calc();});
+["m1Drug","m1Conc","m1Parts","m2Drug","m2Conc","m2Parts","nsParts"].forEach(id=>$(id).addEventListener("input",()=>{if($("preset").value!=="custom"){$("preset").value="custom";calc();}}));
 $("exMethodSeg").addEventListener("click",e=>{
   const b=e.target.closest("button");if(!b)return;
   exMethod=b.dataset.v;
